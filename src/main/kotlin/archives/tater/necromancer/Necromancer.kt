@@ -1,0 +1,36 @@
+package archives.tater.necromancer
+
+import archives.tater.necromancer.entity.NecromancerEntity
+import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings
+import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricDefaultAttributeRegistry
+import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilder
+import net.minecraft.entity.EntityDimensions
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.SpawnGroup
+import net.minecraft.entity.mob.AbstractSkeletonEntity
+import net.minecraft.item.SpawnEggItem
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
+import net.minecraft.util.Identifier
+import org.slf4j.LoggerFactory
+
+object Necromancer : ModInitializer {
+    private val logger = LoggerFactory.getLogger("necromancer")
+
+	fun id(path: String) = Identifier("necromancer", path)
+
+	val NECROMANCER_ENTITY: EntityType<NecromancerEntity> = Registry.register(Registries.ENTITY_TYPE, id("necromancer"), FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::NecromancerEntity).apply {
+		dimensions(EntityDimensions.fixed(0.6f, 1.99f))
+	}.build())
+
+	val NECROMANCER_SPAWN_EGG = Registry.register(Registries.ITEM, id("necromancer_spawn_egg"), SpawnEggItem(
+		NECROMANCER_ENTITY, 0xCCCCCC, 0x00FF00, FabricItemSettings()))
+
+	override fun onInitialize() {
+		// This code runs as soon as Minecraft is in a mod-load-ready state.
+		// However, some things (like resources) may still be uninitialized.
+		// Proceed with mild caution.
+		FabricDefaultAttributeRegistry.register(NECROMANCER_ENTITY, AbstractSkeletonEntity.createAbstractSkeletonAttributes())
+	}
+}
