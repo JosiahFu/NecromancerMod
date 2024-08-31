@@ -1,10 +1,7 @@
 package archives.tater.necromancer.entity
 
-import archives.tater.necromancer.contains
-import archives.tater.necromancer.getValue
-import archives.tater.necromancer.setValue
+import archives.tater.necromancer.*
 import archives.tater.necromancer.tag.NecromancerBiomeTags
-import archives.tater.necromancer.trackedData
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.goal.FleeEntityGoal
@@ -104,6 +101,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
                     refreshPositionAndAngles(owner.blockPos.add(random.nextBetween(-2, 2), if (type == EntityType.PHANTOM) 3 else 0, random.nextBetween(-2, 2)), owner.yaw, 0f)
                     initialize(serverWorld, serverWorld.getLocalDifficulty(blockPos), SpawnReason.MOB_SUMMONED, null, null)
                     (world as ServerWorld).spawnParticles(ParticleTypes.COMPOSTER, x, y, z, 20, 0.5, 1.0, 0.5, 0.0)
+                    (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_SUMMON_PARTICLE, x, y, z, 1, 0.0, 0.0, 0.0, 0.0)
                 })
             }
             owner.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0f, 1.0f)
