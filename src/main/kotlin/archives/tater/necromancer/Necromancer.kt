@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.`object`.builder.v1.entity.FabricEntityTypeBuilde
 import net.minecraft.entity.EntityDimensions
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnGroup
-import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.item.SpawnEggItem
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
@@ -16,9 +15,10 @@ import net.minecraft.util.Identifier
 import org.slf4j.LoggerFactory
 
 object Necromancer : ModInitializer {
-    private val logger = LoggerFactory.getLogger("necromancer")
+	const val MOD_ID = "necromancer"
+    private val logger = LoggerFactory.getLogger(MOD_ID)
 
-	fun id(path: String) = Identifier("necromancer", path)
+	fun id(path: String) = Identifier(MOD_ID, path)
 
 	val NECROMANCER_ENTITY: EntityType<NecromancerEntity> = Registry.register(Registries.ENTITY_TYPE, id("necromancer"), FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::NecromancerEntity).apply {
 		dimensions(EntityDimensions.fixed(0.6f, 1.99f))
@@ -31,6 +31,6 @@ object Necromancer : ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
-		FabricDefaultAttributeRegistry.register(NECROMANCER_ENTITY, AbstractSkeletonEntity.createAbstractSkeletonAttributes())
+		FabricDefaultAttributeRegistry.register(NECROMANCER_ENTITY, NecromancerEntity.necromancerAttributes)
 	}
 }

@@ -1,15 +1,19 @@
 package archives.tater.necromancer.entity
 
+import archives.tater.necromancer.contains
 import archives.tater.necromancer.getValue
 import archives.tater.necromancer.setValue
+import archives.tater.necromancer.tag.NecromancerBiomeTags
 import archives.tater.necromancer.trackedData
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.goal.FleeEntityGoal
 import net.minecraft.entity.ai.goal.Goal
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.mob.AbstractSkeletonEntity
+import net.minecraft.entity.passive.IronGolemEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
@@ -40,7 +44,8 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
 
     override fun initGoals() {
         super.initGoals()
-        goalSelector.add(2, FleeEntityGoal(this, PlayerEntity::class.java, 8.0f, 0.6, 1.0))
+        goalSelector.add(2, FleeEntityGoal(this, PlayerEntity::class.java, 8.0f, 1.0, 1.4))
+        goalSelector.add(2, FleeEntityGoal(this, IronGolemEntity::class.java, 8.0f, 1.0, 1.4))
         goalSelector.add(3, SummonGoal())
     }
 
@@ -57,6 +62,11 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
 
         const val CAST_TIME = 40
         const val COOLDOWN_TIME = 300
+
+        val necromancerAttributes
+            get() = createAbstractSkeletonAttributes().apply {
+                add(EntityAttributes.GENERIC_FOLLOW_RANGE, 40.0)
+            }
     }
 
     inner class SummonGoal : Goal() {
@@ -69,6 +79,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         override fun start() {
             owner.casting = CAST_TIME
             owner.playSound(SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, 1.0f, 1.0f)
+            owner.lookAtEntity(owner.target, 90f, 90f)
         }
 
         override fun tick() {
@@ -77,17 +88,25 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
             val serverWorld = world as ServerWorld
             val distance = owner.squaredDistanceTo(target)
             val (type, count) = when {
-                distance < 12.0.pow(2) -> EntityType.ZOMBIE to 4
-                distance < 24.0.pow(2) -> EntityType.SKELETON to 2
-                else -> EntityType.PHANTOM to 3
+                distance < 8.0.pow(2) -> when (world.getBiome(blockPos)) {
+                    in NecromancerBiomeTags.SPAWNS_HUSK -> EntityType.HUSK
+                    in NecromancerBiomeTags.SPAWNS_DROWNED -> EntityType.DROWNED
+                    else -> EntityType.ZOMBIE
+                } to 4
+                distance < 16.0.pow(2) -> when (world.getBiome(blockPos)) {
+                    in NecromancerBiomeTags.SPAWNS_STRAY -> EntityType.STRAY
+                    else -> EntityType.SKELETON
+                } to 2
+                else -> EntityType.PHANTOM to 2
             }
             repeat(count) {
                 serverWorld.spawnEntityAndPassengers(type.create(world)!!.apply {
-                    refreshPositionAndAngles(this@NecromancerEntity.blockPos.add(random.nextBetween(-2, 2), if (type == EntityType.PHANTOM) 3 else 0, random.nextBetween(-2, 2)), owner.yaw, 0f)
+                    refreshPositionAndAngles(owner.blockPos.add(random.nextBetween(-2, 2), if (type == EntityType.PHANTOM) 3 else 0, random.nextBetween(-2, 2)), owner.yaw, 0f)
                     initialize(serverWorld, serverWorld.getLocalDifficulty(blockPos), SpawnReason.MOB_SUMMONED, null, null)
                     (world as ServerWorld).spawnParticles(ParticleTypes.COMPOSTER, x, y, z, 20, 0.5, 1.0, 0.5, 0.0)
                 })
             }
+            owner.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0f, 1.0f)
             owner.spellCooldown = COOLDOWN_TIME
         }
     }
