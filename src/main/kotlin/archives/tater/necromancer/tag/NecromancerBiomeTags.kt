@@ -8,5 +8,6 @@ object NecromancerBiomeTags : NSTagCollection<Biome>(Necromancer.MOD_ID, Registr
     val SPAWNS_HUSK = tag("spawns_husk")
     val SPAWNS_STRAY = tag("spawns_stray")
     val SPAWNS_DROWNED = tag("spawns_drowned")
+    val SPAWNS_ZOMBIE_PIGLIN = tag("spawns_zombified_piglin")
 }
 

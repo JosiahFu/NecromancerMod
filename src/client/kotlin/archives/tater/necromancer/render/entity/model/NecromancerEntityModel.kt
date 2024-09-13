@@ -2,6 +2,8 @@ package archives.tater.necromancer.render.entity.model
 
 import archives.tater.necromancer.Necromancer
 import archives.tater.necromancer.entity.NecromancerEntity
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
 import net.minecraft.client.model.ModelPart
 import net.minecraft.client.render.entity.model.EntityModelLayer
@@ -9,6 +11,7 @@ import net.minecraft.client.render.entity.model.SkeletonEntityModel
 import net.minecraft.util.math.MathHelper.PI
 import net.minecraft.util.math.MathHelper.cos
 
+@Environment(EnvType.CLIENT)
 class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<NecromancerEntity>(modelPart) {
 
     override fun setAngles(mobEntity: NecromancerEntity, limbAngle: Float, limbDistance: Float, animationProgress: Float, headYaw: Float, headPitch: Float) {

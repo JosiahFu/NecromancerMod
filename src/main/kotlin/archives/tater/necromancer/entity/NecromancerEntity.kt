@@ -12,10 +12,11 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry
 import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.passive.IronGolemEntity
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.particle.ParticleTypes
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import net.minecraft.util.math.random.Random
 import net.minecraft.world.LocalDifficulty
 import net.minecraft.world.World
@@ -81,29 +82,51 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
 
         override fun tick() {
             if (owner.isCasting) return
+            owner.lookAtEntity(owner.target, 180f, 90f)
 
             val serverWorld = world as ServerWorld
             val distance = owner.squaredDistanceTo(target)
             val (type, count) = when {
                 distance < 8.0.pow(2) -> when (world.getBiome(blockPos)) {
-                    in NecromancerBiomeTags.SPAWNS_HUSK -> EntityType.HUSK
-                    in NecromancerBiomeTags.SPAWNS_DROWNED -> EntityType.DROWNED
-                    else -> EntityType.ZOMBIE
-                } to 4
+                    in NecromancerBiomeTags.SPAWNS_HUSK -> EntityType.HUSK to 4
+                    in NecromancerBiomeTags.SPAWNS_DROWNED -> EntityType.DROWNED to 4
+                    in NecromancerBiomeTags.SPAWNS_ZOMBIE_PIGLIN -> EntityType.ZOMBIFIED_PIGLIN to 5
+                    else -> EntityType.ZOMBIE to 6
+                }
                 distance < 16.0.pow(2) -> when (world.getBiome(blockPos)) {
                     in NecromancerBiomeTags.SPAWNS_STRAY -> EntityType.STRAY
                     else -> EntityType.SKELETON
                 } to 2
-                else -> EntityType.PHANTOM to 2
+                else -> EntityType.PHANTOM to 1
             }
+
+            val positions = mutableListOf<BlockPos>()
+
             repeat(count) {
+                attempts@ for(i in 0..<16) { // 16 attempts
+                    val x = owner.blockPos.x + random.nextBetween(-2, 2)
+                    val z = owner.blockPos.z + random.nextBetween(-2, 2)
+                    val y = owner.blockPos.y
+                    for (offsetY in 2 downTo -2) {
+                        val pos = BlockPos(x, y + offsetY, z)
+                        val below = pos.down()
+                        if (world.getBlockState(pos).getCollisionShape(world, pos).isEmpty && (world.getBlockState(below).isSideSolidFullSquare(world, below, Direction.UP) || type == EntityType.PHANTOM) && pos !in positions) {
+                            positions.add(pos.copy())
+                            break@attempts
+                        }
+                    }
+                }
+            }
+
+            for (pos in positions) {
                 serverWorld.spawnEntityAndPassengers(type.create(world)!!.apply {
-                    refreshPositionAndAngles(owner.blockPos.add(random.nextBetween(-2, 2), if (type == EntityType.PHANTOM) 3 else 0, random.nextBetween(-2, 2)), owner.yaw, 0f)
+                    refreshPositionAndAngles(pos, owner.yaw, 0f)
+                    setHeadYaw(owner.headYaw)
                     initialize(serverWorld, serverWorld.getLocalDifficulty(blockPos), SpawnReason.MOB_SUMMONED, null, null)
-                    (world as ServerWorld).spawnParticles(ParticleTypes.COMPOSTER, x, y, z, 20, 0.5, 1.0, 0.5, 0.0)
-                    (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_SUMMON_PARTICLE, x, y, z, 1, 0.0, 0.0, 0.0, 0.0)
+                    (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_PARTICLE_EMITTER, x, y, z, 1, 0.0, 0.0, 0.0, 0.0)
                 })
             }
+
             owner.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0f, 1.0f)
             owner.spellCooldown = COOLDOWN_TIME
         }

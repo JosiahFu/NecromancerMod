@@ -3,6 +3,8 @@ package archives.tater.necromancer.render.entity
 import archives.tater.necromancer.Necromancer
 import archives.tater.necromancer.entity.NecromancerEntity
 import archives.tater.necromancer.render.entity.model.NecromancerEntityModel
+import net.fabricmc.api.EnvType
+import net.fabricmc.api.Environment
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.BipedEntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory.Context
@@ -10,6 +12,7 @@ import net.minecraft.client.render.entity.feature.EyesFeatureRenderer
 import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.util.Identifier
 
+@Environment(EnvType.CLIENT)
 class NecromancerEntityRenderer(
     ctx: Context,
     layer: EntityModelLayer,

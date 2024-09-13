@@ -1,5 +1,6 @@
 package archives.tater.necromancer.client.particle
 
+import archives.tater.necromancer.toEach
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*
@@ -8,32 +9,47 @@ import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.particle.DefaultParticleType
-import net.minecraft.util.math.MathHelper.lerp
+import net.minecraft.util.math.MathHelper.*
+import org.joml.Quaternionf
 import org.joml.Vector3f
 
-@Environment(EnvType.CLIENT)
-class NecromancerSummonParticle(
+class NecromancerParticle(
     clientWorld: ClientWorld,
     x: Double,
     y: Double,
     z: Double,
-) : SpriteBillboardParticle(clientWorld, x, y, z, 0.0, 0.0, 0.0) {
-    init {
-        velocityX = 0.0
-        velocityY = 0.0
-        velocityZ = 0.0
-        maxAge = 40
-        alpha = 0.5f
+    velocityY: Double,
+) :
+    SpriteBillboardParticle(clientWorld, x, y, z, 0.0, 0.0, 0.0) {
+        init {
+            maxAge = MAX_AGE
+            velocityX = 0.0
+            this.velocityY = velocityY
+            velocityZ = 0.0
+        }
+
+    override fun getType(): ParticleTextureSheet {
+        return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
     }
 
-    override fun getType(): ParticleTextureSheet = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
+    override fun getSize(tickDelta: Float): Float = 3 / 16f / 2
 
-    override fun getSize(tickDelta: Float) = 22 / 32f
+    override fun getBrightness(tint: Float): Int = LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE
 
     override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
         val renderX = (lerp(tickDelta.toDouble(), this.prevPosX, this.x) - camera.pos.x).toFloat()
-        val renderY = (lerp(tickDelta.toDouble(), this.prevPosY, this.y) - camera.pos.y).toFloat() + 0.05f
+        val renderY = (lerp(tickDelta.toDouble(), this.prevPosY, this.y) - camera.pos.y).toFloat()
         val renderZ = (lerp(tickDelta.toDouble(), this.prevPosZ, this.z) - camera.pos.z).toFloat()
+
+//        val rotation = if (this.angle == 0.0f)
+//            camera.rotation
+//        else
+//            Quaternionf(camera.rotation).apply {
+//                rotateZ(lerp(tickDelta, prevAngle, angle))
+//            }
+
+
+        val rotation = Quaternionf().rotationYXZ(PI - RADIANS_PER_DEGREE * camera.yaw, TAU / 4, 0f)
 
         val size = getSize(tickDelta)
 
@@ -42,13 +58,13 @@ class NecromancerSummonParticle(
             Vector3f(-1.0f, 0.0f, 1.0f),
             Vector3f(1.0f, 0.0f, 1.0f),
             Vector3f(1.0f, 0.0f, -1.0f)
-        ).onEach {
-            it.mul(size)
-            it.add(renderX, renderY, renderZ)
+        ).toEach {
+            rotate(rotation)
+            mul(size)
+            add(renderX, renderY, renderZ)
         }
 
-//        val light = getBrightness(tickDelta)
-        val light = LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE
+        val light = getBrightness(tickDelta)
 
         vector3fs.forEachIndexed { index, vec ->
             with (vertexConsumer.vertex(vec.x.toDouble(), vec.y.toDouble(), vec.z.toDouble())) {
@@ -70,21 +86,30 @@ class NecromancerSummonParticle(
         }
     }
 
+    override fun tick() {
+//        velocityY = MAX_VELOCITY * (1 - age / MAX_AGE.toFloat())
+        alpha = 0.5f * (1 - age / MAX_AGE.toFloat())
+        super.tick()
+    }
+
+    companion object {
+        const val MAX_AGE = 40
+        const val MAX_VELOCITY = 0.1
+    }
+
     @Environment(EnvType.CLIENT)
     class Factory(private val spriteProvider: SpriteProvider) : ParticleFactory<DefaultParticleType> {
         override fun createParticle(
-            defaultParticleType: DefaultParticleType,
-            clientWorld: ClientWorld,
+            parameters: DefaultParticleType,
+            world: ClientWorld,
             x: Double,
             y: Double,
             z: Double,
             velocityX: Double,
             velocityY: Double,
             velocityZ: Double
-        ): Particle {
-            return NecromancerSummonParticle(clientWorld, x, y, z).apply {
-                setSprite(spriteProvider)
-            }
+        ): Particle = NecromancerParticle(world, x, y, z, velocityY).apply {
+            setSprite(spriteProvider)
         }
     }
 }

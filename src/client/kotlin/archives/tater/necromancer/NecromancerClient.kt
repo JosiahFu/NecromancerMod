@@ -1,5 +1,7 @@
 package archives.tater.necromancer
 
+import archives.tater.necromancer.client.particle.NecromancerEmitterParticle
+import archives.tater.necromancer.client.particle.NecromancerParticle
 import archives.tater.necromancer.client.particle.NecromancerSummonParticle
 import archives.tater.necromancer.render.entity.NecromancerEntityRenderer
 import archives.tater.necromancer.render.entity.model.NecromancerEntityModel
@@ -15,5 +17,7 @@ object NecromancerClient : ClientModInitializer {
 		EntityRendererRegistry.register(Necromancer.NECROMANCER_ENTITY, ::NecromancerEntityRenderer)
 
 		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_SUMMON_PARTICLE, NecromancerSummonParticle::Factory)
+		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_PARTICLE, NecromancerParticle::Factory)
+		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_PARTICLE_EMITTER, NecromancerEmitterParticle.Factory())
 	}
 }

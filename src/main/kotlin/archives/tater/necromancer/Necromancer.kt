@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory
 
 object Necromancer : ModInitializer {
 	const val MOD_ID = "necromancer"
-    private val logger = LoggerFactory.getLogger(MOD_ID)
+    val logger = LoggerFactory.getLogger(MOD_ID)
 
 	fun id(path: String) = Identifier(MOD_ID, path)
 
@@ -29,7 +29,9 @@ object Necromancer : ModInitializer {
 	val NECROMANCER_SPAWN_EGG: SpawnEggItem = Registry.register(Registries.ITEM, id("necromancer_spawn_egg"), SpawnEggItem(
 		NECROMANCER_ENTITY, 0xCCCCCC, 0x00FF00, FabricItemSettings()))
 
+	val NECROMANCER_PARTICLE: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer"), FabricParticleTypes.simple())
 	val NECROMANCER_SUMMON_PARTICLE: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer_summon"), FabricParticleTypes.simple())
+	val NECROMANCER_PARTICLE_EMITTER: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer_emitter"), FabricParticleTypes.simple())
 
 	override fun onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
