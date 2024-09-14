@@ -13,6 +13,7 @@ import net.minecraft.util.math.MathHelper.*
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
+@Environment(EnvType.CLIENT)
 class NecromancerParticle(
     clientWorld: ClientWorld,
     x: Double,
@@ -92,9 +93,9 @@ class NecromancerParticle(
         super.tick()
     }
 
+    @Environment(EnvType.CLIENT)
     companion object {
-        const val MAX_AGE = 40
-        const val MAX_VELOCITY = 0.1
+        const val MAX_AGE = 15
     }
 
     @Environment(EnvType.CLIENT)

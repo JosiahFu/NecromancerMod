@@ -1,4 +1,4 @@
-package archives.tater.necromancer.render.entity.model
+package archives.tater.necromancer.client.render.entity.model
 
 import archives.tater.necromancer.Necromancer
 import archives.tater.necromancer.client.ModelPartBuilder
@@ -44,6 +44,7 @@ class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<Necroma
         }
     }
 
+    @Environment(EnvType.CLIENT)
     companion object {
         val LAYER = EntityModelLayer(Necromancer.id("necromancer"), "main")
 
@@ -103,7 +104,7 @@ class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<Necroma
             }.let { TexturedModelData.of(it, 64, 64) }
 
         fun register() {
-            EntityModelLayerRegistry.registerModelLayer(LAYER, ::texturedModelData)
+            EntityModelLayerRegistry.registerModelLayer(LAYER, Companion::texturedModelData)
         }
     }
 }

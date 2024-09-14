@@ -3,8 +3,8 @@ package archives.tater.necromancer
 import archives.tater.necromancer.client.particle.NecromancerEmitterParticle
 import archives.tater.necromancer.client.particle.NecromancerParticle
 import archives.tater.necromancer.client.particle.NecromancerSummonParticle
-import archives.tater.necromancer.render.entity.NecromancerEntityRenderer
-import archives.tater.necromancer.render.entity.model.NecromancerEntityModel
+import archives.tater.necromancer.client.render.entity.NecromancerEntityRenderer
+import archives.tater.necromancer.client.render.entity.model.NecromancerEntityModel
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry

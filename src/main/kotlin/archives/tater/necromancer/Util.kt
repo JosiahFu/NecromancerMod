@@ -4,8 +4,10 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandler
+import net.minecraft.particle.ParticleEffect
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import kotlin.reflect.KProperty
 
@@ -24,3 +26,7 @@ fun BlockPos.copy() = BlockPos(x, y, z)
 
 inline fun <T, C: Iterable<T>> C.toEach(action: T.() -> Unit): C = onEach(action)
 inline fun <T> Array<out T>.toEach(action: T.() -> Unit): Array<out T> = onEach(action)
+
+@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+fun <T: ParticleEffect> ServerWorld.spawnParticles(particle: T, x: Double, y: Double, z: Double, count: Int, deltaX: Double = 0.0, deltaY: Double = 0.0, deltaZ: Double = 0.0, speed: Double = 0.0): Int =
+    spawnParticles(particle, x, y, z, count, deltaX, deltaY, deltaZ, speed)

@@ -32,6 +32,12 @@
 				"value": "archives.tater.necromancer.NecromancerDataGenerator",
 				"adapter": "kotlin"
 			}
+		],
+		"cardinal-components": [
+			{
+				"value": "archives.tater.necromancer.cca.NecromancerComponents",
+				"adapter": "kotlin"
+			}
 		]
 	},
 	"mixins": [
@@ -41,6 +47,11 @@
 			"environment": "client"
 		}
 	],
+	"custom": {
+		"cardinal-components": [
+			"necromancer:necromanced"
+		]
+	},
 	"accessWidener": "necromancer.accesswidener",
 	"depends": {
 		"fabricloader": ">=0.16.3",

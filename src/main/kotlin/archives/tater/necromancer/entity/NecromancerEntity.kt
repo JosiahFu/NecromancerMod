@@ -1,6 +1,8 @@
 package archives.tater.necromancer.entity
 
 import archives.tater.necromancer.*
+import archives.tater.necromancer.cca.NecromancedComponent.Companion.necromancedOwner
+import archives.tater.necromancer.cca.NecromancedComponent.Companion.startEmerge
 import archives.tater.necromancer.tag.NecromancerBiomeTags
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
@@ -82,6 +84,11 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
 
         override fun tick() {
             if (owner.isCasting) return
+            summonMobs()
+            owner.spellCooldown = COOLDOWN_TIME
+        }
+
+        private fun summonMobs() {
             owner.lookAtEntity(owner.target, 180f, 90f)
 
             val serverWorld = world as ServerWorld
@@ -93,24 +100,33 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
                     in NecromancerBiomeTags.SPAWNS_ZOMBIE_PIGLIN -> EntityType.ZOMBIFIED_PIGLIN to 5
                     else -> EntityType.ZOMBIE to 6
                 }
+
                 distance < 16.0.pow(2) -> when (world.getBiome(blockPos)) {
                     in NecromancerBiomeTags.SPAWNS_STRAY -> EntityType.STRAY
                     else -> EntityType.SKELETON
                 } to 2
+
                 else -> EntityType.PHANTOM to 1
             }
 
             val positions = mutableListOf<BlockPos>()
 
             repeat(count) {
-                attempts@ for(i in 0..<16) { // 16 attempts
+                attempts@ for (i in 0..<16) { // 16 attempts
                     val x = owner.blockPos.x + random.nextBetween(-2, 2)
                     val z = owner.blockPos.z + random.nextBetween(-2, 2)
                     val y = owner.blockPos.y
                     for (offsetY in 2 downTo -2) {
                         val pos = BlockPos(x, y + offsetY, z)
                         val below = pos.down()
-                        if (world.getBlockState(pos).getCollisionShape(world, pos).isEmpty && (world.getBlockState(below).isSideSolidFullSquare(world, below, Direction.UP) || type == EntityType.PHANTOM) && pos !in positions) {
+                        if (world.getBlockState(pos)
+                                .getCollisionShape(world, pos).isEmpty && (world.getBlockState(below)
+                                .isSideSolidFullSquare(
+                                    world,
+                                    below,
+                                    Direction.UP
+                                ) || type == EntityType.PHANTOM) && pos !in positions
+                        ) {
                             positions.add(pos.copy())
                             break@attempts
                         }
@@ -123,12 +139,13 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
                     refreshPositionAndAngles(pos, owner.yaw, 0f)
                     setHeadYaw(owner.headYaw)
                     initialize(serverWorld, serverWorld.getLocalDifficulty(blockPos), SpawnReason.MOB_SUMMONED, null, null)
-                    (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_PARTICLE_EMITTER, x, y, z, 1, 0.0, 0.0, 0.0, 0.0)
+                    necromancedOwner = owner
+                    startEmerge()
+                    (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_PARTICLE_EMITTER, x, y, z, 1)
                 })
             }
 
             owner.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0f, 1.0f)
-            owner.spellCooldown = COOLDOWN_TIME
         }
     }
 }

@@ -1,8 +1,8 @@
-package archives.tater.necromancer.render.entity
+package archives.tater.necromancer.client.render.entity
 
 import archives.tater.necromancer.Necromancer
+import archives.tater.necromancer.client.render.entity.model.NecromancerEntityModel
 import archives.tater.necromancer.entity.NecromancerEntity
-import archives.tater.necromancer.render.entity.model.NecromancerEntityModel
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.render.RenderLayer
@@ -27,6 +27,7 @@ class NecromancerEntityRenderer(
 
     override fun getTexture(entity: NecromancerEntity?): Identifier = TEXTURE
 
+    @Environment(EnvType.CLIENT)
     companion object {
         val TEXTURE = Necromancer.id("textures/entity/necromancer.png")
         val EYES_TEXTURE: RenderLayer = RenderLayer.getEyes(Necromancer.id("textures/entity/necromancer_eyes.png"))
