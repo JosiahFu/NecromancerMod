@@ -5,14 +5,13 @@ import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
-import dev.onyxstudios.cca.api.v3.component.tick.ServerTickingComponent
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import java.util.*
 
-class NecromancedComponent(private val owner: MobEntity) : Component, AutoSyncedComponent, ServerTickingComponent {
+class NecromancedComponent(private val mob: MobEntity) : Component, AutoSyncedComponent {
     var ownerUUID: UUID? = null
         private set
     var emergeTicks: Int = 0
@@ -30,16 +29,18 @@ class NecromancedComponent(private val owner: MobEntity) : Component, AutoSynced
         tag.putInt(EMERGE_TICKS, emergeTicks)
     }
 
-    override fun serverTick() {
-        if (emergeTicks > 0)
-            emergeTicks--
-    }
-
     companion object {
         private const val OWNER_UUID = "Owner"
         private const val EMERGE_TICKS = "EmergeTicks"
 
+        const val MAX_EMERGE_TICKS = 40
+
         val KEY: ComponentKey<NecromancedComponent> = ComponentRegistry.getOrCreate(Necromancer.id("necromanced"), NecromancedComponent::class.java)
+
+        @JvmStatic
+        @get:JvmName("getOwnerUUID")
+        val MobEntity.necromancedOwnerUUID: UUID?
+            get() = KEY.getNullable(this)?.ownerUUID
 
         @JvmStatic
         @get:JvmName("getOwner")
@@ -66,7 +67,16 @@ class NecromancedComponent(private val owner: MobEntity) : Component, AutoSynced
 
         @JvmStatic
         fun MobEntity.startEmerge() {
-            KEY.getNullable(this)?.emergeTicks = 40
+            KEY.getNullable(this)?.emergeTicks = MAX_EMERGE_TICKS
+        }
+
+        @JvmStatic
+        fun MobEntity.tickEmerge() {
+            KEY.getNullable(this)?.run {
+                if (emergeTicks <= 0) return
+                emergeTicks--
+                KEY.sync(this@tickEmerge)
+            }
         }
     }
 }

@@ -3,7 +3,11 @@
 	"package": "archives.tater.necromancer.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"AbstractSkeletonEntityMixin",
+		"MobEntityMixin",
+		"PhantomEntityMixin",
+		"TrackTargetGoalMixin",
+		"ZombieEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

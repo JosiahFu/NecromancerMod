@@ -9,6 +9,7 @@ import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Vec3d
 import kotlin.reflect.KProperty
 
 operator fun <T> TrackedData<T>.getValue(thisRef: Entity, property: KProperty<*>): T = thisRef.dataTracker.get(this)
@@ -30,3 +31,6 @@ inline fun <T> Array<out T>.toEach(action: T.() -> Unit): Array<out T> = onEach(
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER")
 fun <T: ParticleEffect> ServerWorld.spawnParticles(particle: T, x: Double, y: Double, z: Double, count: Int, deltaX: Double = 0.0, deltaY: Double = 0.0, deltaZ: Double = 0.0, speed: Double = 0.0): Int =
     spawnParticles(particle, x, y, z, count, deltaX, deltaY, deltaZ, speed)
+
+operator fun BlockPos.minus(other: Vec3d): Vec3d = toCenterPos() - other
+operator fun Vec3d.minus(other: Vec3d): Vec3d = subtract(other)

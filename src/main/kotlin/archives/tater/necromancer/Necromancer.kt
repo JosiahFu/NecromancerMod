@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 
 object Necromancer : ModInitializer {
 	const val MOD_ID = "necromancer"
+	@JvmField
     val logger = LoggerFactory.getLogger(MOD_ID)
 
 	fun id(path: String) = Identifier(MOD_ID, path)
