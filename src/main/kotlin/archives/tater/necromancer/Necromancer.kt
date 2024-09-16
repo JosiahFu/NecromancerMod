@@ -14,17 +14,18 @@ import net.minecraft.particle.DefaultParticleType
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import net.minecraft.util.Identifier
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 object Necromancer : ModInitializer {
 	const val MOD_ID = "necromancer"
 	@JvmField
-    val logger = LoggerFactory.getLogger(MOD_ID)
+    val logger: Logger = LoggerFactory.getLogger(MOD_ID)
 
 	fun id(path: String) = Identifier(MOD_ID, path)
 
 	val NECROMANCER_ENTITY: EntityType<NecromancerEntity> = Registry.register(Registries.ENTITY_TYPE, id("necromancer"), FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, ::NecromancerEntity).apply {
-		dimensions(EntityDimensions.fixed(0.6f, 1.99f))
+		dimensions(EntityDimensions.fixed(0.65f, 2.2f))
 	}.build())
 
 	val NECROMANCER_SPAWN_EGG: SpawnEggItem = Registry.register(Registries.ITEM, id("necromancer_spawn_egg"), SpawnEggItem(

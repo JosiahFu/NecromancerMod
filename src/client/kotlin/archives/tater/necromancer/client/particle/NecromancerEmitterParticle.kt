@@ -29,11 +29,11 @@ class NecromancerEmitterParticle(
             world.addParticle(Necromancer.NECROMANCER_SUMMON_PARTICLE, x, y, z, 0.0, 0.0, 0.0)
         }
 
-//        for (i in 0..<1) {
+        repeat(2) {
             val theta = random.nextFloat() * TAU
             val r = random.nextFloat() * RADIUS
             world.addParticle(Necromancer.NECROMANCER_PARTICLE, x + r * cos(theta), y, z + r * sin(theta), 0.0, 0.2 * random.nextDouble() + 0.1, 0.0)
-//        }
+        }
 
         super.tick()
     }

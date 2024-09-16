@@ -89,7 +89,7 @@ class NecromancerParticle(
 
     override fun tick() {
 //        velocityY = MAX_VELOCITY * (1 - age / MAX_AGE.toFloat())
-        alpha = 0.5f * (1 - age / MAX_AGE.toFloat())
+        alpha = 0.75f * (1 - age / MAX_AGE.toFloat())
         super.tick()
     }
 

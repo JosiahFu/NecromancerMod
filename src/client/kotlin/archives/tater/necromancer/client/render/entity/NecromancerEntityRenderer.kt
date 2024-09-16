@@ -10,6 +10,7 @@ import net.minecraft.client.render.entity.BipedEntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory.Context
 import net.minecraft.client.render.entity.feature.EyesFeatureRenderer
 import net.minecraft.client.render.entity.model.EntityModelLayer
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 
 @Environment(EnvType.CLIENT)
@@ -26,6 +27,10 @@ class NecromancerEntityRenderer(
     constructor(ctx: Context) : this(ctx, NecromancerEntityModel.LAYER)
 
     override fun getTexture(entity: NecromancerEntity?): Identifier = TEXTURE
+
+    override fun scale(entity: NecromancerEntity, matrixStack: MatrixStack, amount: Float) {
+        matrixStack.scale(1.1f, 1.1f, 1.1f)
+    }
 
     @Environment(EnvType.CLIENT)
     companion object {

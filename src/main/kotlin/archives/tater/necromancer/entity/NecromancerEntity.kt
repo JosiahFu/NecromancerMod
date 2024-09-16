@@ -85,6 +85,8 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         val necromancerAttributes: DefaultAttributeContainer.Builder
             get() = createAbstractSkeletonAttributes().apply {
                 add(EntityAttributes.GENERIC_FOLLOW_RANGE, 40.0)
+                add(EntityAttributes.GENERIC_MAX_HEALTH, 40.0)
+                add(EntityAttributes.GENERIC_ARMOR, 10.0)
             }
     }
 
