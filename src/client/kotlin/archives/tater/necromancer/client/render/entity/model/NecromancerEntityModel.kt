@@ -20,7 +20,7 @@ import net.minecraft.util.math.MathHelper.cos
 
 @Environment(EnvType.CLIENT)
 class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<NecromancerEntity>(modelPart) {
-    val jacket = modelPart.getChild(EntityModelPartNames.JACKET)
+    private val jacket: ModelPart = modelPart.getChild(EntityModelPartNames.JACKET)
 
     override fun getBodyParts(): MutableIterable<ModelPart> {
         return Iterables.concat(super.getBodyParts(), listOf(jacket))

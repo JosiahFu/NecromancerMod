@@ -56,6 +56,7 @@ class NecromancedComponent(private val mob: MobEntity) : Component, AutoSyncedCo
             }
 
         @JvmStatic
+        @get:JvmName("hasNecromancedOwner")
         val MobEntity.hasNecromancedOwner: Boolean get() = KEY.getNullable(this)?.ownerUUID != null
 
         /**
