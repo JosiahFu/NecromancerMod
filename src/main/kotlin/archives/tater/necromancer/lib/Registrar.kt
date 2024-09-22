@@ -26,7 +26,7 @@ abstract class Registrar<T>(val namespace: String, private val registry: Registr
 
 fun Registrar<ParticleType<*>>.register(path: String): DefaultParticleType = register(path, FabricParticleTypes.simple())
 
-fun <U: Entity> Registrar<EntityType<*>>.register(
+inline fun <U: Entity> Registrar<EntityType<*>>.register(
     path: String,
     constructor: EntityType.EntityFactory<U>,
     spawnGroup: SpawnGroup = SpawnGroup.MISC,
@@ -34,7 +34,7 @@ fun <U: Entity> Registrar<EntityType<*>>.register(
 ): EntityType<U> =
     register(path, FabricEntityTypeBuilder.create(spawnGroup, constructor).apply(init).build())
 
-fun Registrar<Item>.registerGroup(path: String, init: ItemGroup.Builder.() -> Unit): ItemGroup =
+inline fun Registrar<Item>.registerGroup(path: String, init: ItemGroup.Builder.() -> Unit): ItemGroup =
     Registry.register(Registries.ITEM_GROUP, Identifier(namespace, path), FabricItemGroup.builder().apply(init).build())
 
 fun Registrar<Item>.modifyGroup(group: RegistryKey<ItemGroup>, block: FabricItemGroupEntries.() -> Unit) {

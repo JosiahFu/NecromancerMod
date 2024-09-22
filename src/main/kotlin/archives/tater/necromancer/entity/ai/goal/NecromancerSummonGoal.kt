@@ -3,10 +3,7 @@ package archives.tater.necromancer.entity.ai.goal
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.necromancedOwner
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.startEmerge
 import archives.tater.necromancer.entity.NecromancerEntity
-import archives.tater.necromancer.lib.contains
-import archives.tater.necromancer.lib.horizontalSquaredDistance
-import archives.tater.necromancer.lib.minus
-import archives.tater.necromancer.lib.spawnParticles
+import archives.tater.necromancer.lib.*
 import archives.tater.necromancer.particle.NecromancerModParticles
 import archives.tater.necromancer.tag.NecromancerModTags
 import net.minecraft.entity.EntityType
@@ -75,9 +72,7 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
 
                     structureWithin(NecromancerModTags.Structure.SPAWNS_WITHER_SKELETON, 32) -> EntityType.WITHER_SKELETON
                     biome in NecromancerModTags.Biome.SPAWNS_HUSK && skyAccess -> EntityType.HUSK
-                    biome in NecromancerModTags.Biome.SPAWNS_DROWNED || owner.world.getFluidState(blockPos).isOf(
-                        Fluids.WATER
-                    ) -> EntityType.DROWNED
+                    biome in NecromancerModTags.Biome.SPAWNS_DROWNED || owner.world.getFluidState(blockPos) isOf Fluids.WATER -> EntityType.DROWNED
                     biome in NecromancerModTags.Biome.SPAWNS_ZOMBIE_PIGLIN -> EntityType.ZOMBIFIED_PIGLIN
                     structureWithin(StructureTags.VILLAGE, 32) -> EntityType.ZOMBIE_VILLAGER
                     else -> EntityType.ZOMBIE
@@ -88,9 +83,7 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                 for (offsetY in 2 downTo -2) {
                     val pos = BlockPos(x, y + offsetY, z)
                     val below = pos.down()
-                    if ((type == EntityType.DROWNED && owner.world.getFluidState(pos).isOf(
-                            Fluids.WATER
-                        ))
+                    if ((type == EntityType.DROWNED && owner.world.getFluidState(pos) isOf Fluids.WATER)
                         || owner.world.getBlockState(pos)
                             .getCollisionShape(owner.world, pos).isEmpty && (owner.world.getBlockState(below)
                             .isSideSolidFullSquare(owner.world, below, Direction.UP)
