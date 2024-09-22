@@ -1,6 +1,6 @@
 package archives.tater.necromancer.client.particle
 
-import archives.tater.necromancer.toEach
+import archives.tater.necromancer.lib.toEach
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.*

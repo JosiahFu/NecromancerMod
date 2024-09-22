@@ -1,4 +1,4 @@
-package archives.tater.necromancer
+package archives.tater.necromancer.lib
 
 import net.minecraft.entity.Entity
 import net.minecraft.entity.data.DataTracker

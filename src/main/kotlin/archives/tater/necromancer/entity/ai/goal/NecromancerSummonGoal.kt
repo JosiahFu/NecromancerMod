@@ -1,10 +1,14 @@
 package archives.tater.necromancer.entity.ai.goal
 
-import archives.tater.necromancer.*
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.necromancedOwner
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.startEmerge
 import archives.tater.necromancer.entity.NecromancerEntity
-import archives.tater.necromancer.tag.NecromancerTags
+import archives.tater.necromancer.lib.contains
+import archives.tater.necromancer.lib.horizontalSquaredDistance
+import archives.tater.necromancer.lib.minus
+import archives.tater.necromancer.lib.spawnParticles
+import archives.tater.necromancer.particle.NecromancerModParticles
+import archives.tater.necromancer.tag.NecromancerModTags
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.goal.Goal
@@ -65,16 +69,16 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                     distance > 24.0.pow(2) && skyAccess -> EntityType.PHANTOM
 
                     distance > 8.0.pow(2) -> when {
-                        biome in NecromancerTags.Biome.SPAWNS_STRAY && skyAccess -> EntityType.STRAY
+                        biome in NecromancerModTags.Biome.SPAWNS_STRAY && skyAccess -> EntityType.STRAY
                         else -> EntityType.SKELETON
                     }
 
-                    structureWithin(NecromancerTags.Structure.SPAWNS_WITHER_SKELETON, 32) -> EntityType.WITHER_SKELETON
-                    biome in NecromancerTags.Biome.SPAWNS_HUSK && skyAccess -> EntityType.HUSK
-                    biome in NecromancerTags.Biome.SPAWNS_DROWNED || owner.world.getFluidState(blockPos).isOf(
+                    structureWithin(NecromancerModTags.Structure.SPAWNS_WITHER_SKELETON, 32) -> EntityType.WITHER_SKELETON
+                    biome in NecromancerModTags.Biome.SPAWNS_HUSK && skyAccess -> EntityType.HUSK
+                    biome in NecromancerModTags.Biome.SPAWNS_DROWNED || owner.world.getFluidState(blockPos).isOf(
                         Fluids.WATER
                     ) -> EntityType.DROWNED
-                    biome in NecromancerTags.Biome.SPAWNS_ZOMBIE_PIGLIN -> EntityType.ZOMBIFIED_PIGLIN
+                    biome in NecromancerModTags.Biome.SPAWNS_ZOMBIE_PIGLIN -> EntityType.ZOMBIFIED_PIGLIN
                     structureWithin(StructureTags.VILLAGE, 32) -> EntityType.ZOMBIE_VILLAGER
                     else -> EntityType.ZOMBIE
                 }
@@ -113,7 +117,7 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                 this.necromancedOwner = owner
                 owner.summons.add(this.uuid)
                 startEmerge()
-                (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_SUMMON_PARTICLE_EMITTER, x, y, z, 1)
+                (world as ServerWorld).spawnParticles(NecromancerModParticles.NECROMANCER_SUMMON_PARTICLE_EMITTER, x, y, z, 1)
             })
         }
 

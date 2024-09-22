@@ -1,7 +1,7 @@
 package archives.tater.necromancer.client.particle
 
-import archives.tater.necromancer.Necromancer
 import archives.tater.necromancer.entity.NecromancerEntity
+import archives.tater.necromancer.particle.NecromancerModParticles
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.minecraft.client.particle.NoRenderParticle
@@ -27,13 +27,13 @@ class NecromancerEmitterParticle(
 
     override fun tick() {
         if (isSummon && age == 0) {
-            world.addParticle(Necromancer.NECROMANCER_SUMMON_PARTICLE, x, y, z, 0.0, 0.0, 0.0)
+            world.addParticle(NecromancerModParticles.NECROMANCER_SUMMON_PARTICLE, x, y, z, 0.0, 0.0, 0.0)
         }
 
         repeat(2) {
             val theta = random.nextFloat() * TAU
             val r = random.nextFloat() * RADIUS
-            world.addParticle(Necromancer.NECROMANCER_PARTICLE, x + r * cos(theta), y, z + r * sin(theta), 0.0, 0.2 * random.nextDouble() + 0.1, 0.0)
+            world.addParticle(NecromancerModParticles.NECROMANCER_PARTICLE, x + r * cos(theta), y, z + r * sin(theta), 0.0, 0.2 * random.nextDouble() + 0.1, 0.0)
         }
 
         super.tick()

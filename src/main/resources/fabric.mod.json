@@ -17,25 +17,25 @@
 	"entrypoints": {
 		"main": [
 			{
-				"value": "archives.tater.necromancer.Necromancer",
+				"value": "archives.tater.necromancer.NecromancerMod",
 				"adapter": "kotlin"
 			}
 		],
 		"client": [
 			{
-				"value": "archives.tater.necromancer.NecromancerClient",
+				"value": "archives.tater.necromancer.NecromancerModClient",
 				"adapter": "kotlin"
 			}
 		],
 		"fabric-datagen": [
 			{
-				"value": "archives.tater.necromancer.NecromancerDataGenerator",
+				"value": "archives.tater.necromancer.NecromancerModDataGenerator",
 				"adapter": "kotlin"
 			}
 		],
 		"cardinal-components": [
 			{
-				"value": "archives.tater.necromancer.cca.NecromancerComponents",
+				"value": "archives.tater.necromancer.cca.NecromancerModComponents",
 				"adapter": "kotlin"
 			}
 		]

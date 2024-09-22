@@ -1,7 +1,7 @@
 package archives.tater.necromancer.client.render.entity.model
 
-import archives.tater.necromancer.Necromancer
-import archives.tater.necromancer.client.ModelPartBuilder
+import archives.tater.necromancer.NecromancerMod
+import archives.tater.necromancer.client.lib.ModelPartBuilder
 import archives.tater.necromancer.entity.NecromancerEntity
 import com.google.common.collect.Iterables
 import net.fabricmc.api.EnvType
@@ -46,7 +46,7 @@ class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<Necroma
 
     @Environment(EnvType.CLIENT)
     companion object {
-        val LAYER = EntityModelLayer(Necromancer.id("necromancer"), "main")
+        val LAYER = EntityModelLayer(NecromancerMod.id("necromancer"), "main")
 
         val texturedModelData: TexturedModelData
             get() = BipedEntityModel.getModelData(Dilation.NONE, 0f).apply {

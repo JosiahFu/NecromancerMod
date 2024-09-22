@@ -1,6 +1,6 @@
 package archives.tater.necromancer.client.render.entity.features
 
-import archives.tater.necromancer.Necromancer
+import archives.tater.necromancer.NecromancerMod
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.hasNecromancedOwner
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -25,15 +25,15 @@ class NecromancedEyesFeatureRenderer<T: MobEntity, M: EntityModel<T>>(context: F
     @Environment(EnvType.CLIENT)
     companion object {
         @JvmField
-        val ZOMBIE_EYES: RenderLayer = RenderLayer.getEyes(Necromancer.id("textures/entity/zombie_eyes.png"))
+        val ZOMBIE_EYES: RenderLayer = RenderLayer.getEyes(NecromancerMod.id("textures/entity/zombie_eyes.png"))
 
         @JvmField
-        val SKELETON_EYES: RenderLayer = RenderLayer.getEyes(Necromancer.id("textures/entity/skeleton_eyes.png"))
+        val SKELETON_EYES: RenderLayer = RenderLayer.getEyes(NecromancerMod.id("textures/entity/skeleton_eyes.png"))
 
         @JvmField
-        val ZOMBIE_PIGLIN_EYES: RenderLayer = RenderLayer.getEyes(Necromancer.id("textures/entity/zombified_piglin_eyes.png"))
+        val ZOMBIE_PIGLIN_EYES: RenderLayer = RenderLayer.getEyes(NecromancerMod.id("textures/entity/zombified_piglin_eyes.png"))
 
         @JvmField
-        val ZOMBIE_VILLAGER_EYES: RenderLayer = RenderLayer.getEyes(Necromancer.id("textures/entity/zombie_villager_eyes.png"))
+        val ZOMBIE_VILLAGER_EYES: RenderLayer = RenderLayer.getEyes(NecromancerMod.id("textures/entity/zombie_villager_eyes.png"))
     }
 }

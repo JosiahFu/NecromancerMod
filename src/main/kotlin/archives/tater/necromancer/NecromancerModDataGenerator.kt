@@ -1,5 +1,6 @@
 package archives.tater.necromancer
 
+import archives.tater.necromancer.item.NecromancerModItems
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -10,7 +11,7 @@ import net.minecraft.data.client.Model
 import net.minecraft.util.Identifier
 import java.util.*
 
-object NecromancerDataGenerator : DataGeneratorEntrypoint {
+object NecromancerModDataGenerator : DataGeneratorEntrypoint {
 	override fun onInitializeDataGenerator(fabricDataGenerator: FabricDataGenerator) {
 		fabricDataGenerator.createPack().apply {
 			addProvider(::ModelGenerator)
@@ -23,7 +24,7 @@ object NecromancerDataGenerator : DataGeneratorEntrypoint {
 		}
 
 		override fun generateItemModels(itemModelGenerator: ItemModelGenerator) {
-			itemModelGenerator.register(Necromancer.NECROMANCER_SPAWN_EGG, Model(Optional.of(Identifier("item/template_spawn_egg")), Optional.empty()))
+			itemModelGenerator.register(NecromancerModItems.NECROMANCER_SPAWN_EGG, Model(Optional.of(Identifier("item/template_spawn_egg")), Optional.empty()))
 		}
 	}
 }

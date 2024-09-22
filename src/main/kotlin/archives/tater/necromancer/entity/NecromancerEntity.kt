@@ -3,6 +3,8 @@ package archives.tater.necromancer.entity
 import archives.tater.necromancer.*
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.hasNecromancedOwner
 import archives.tater.necromancer.entity.ai.goal.NecromancerSummonGoal
+import archives.tater.necromancer.lib.*
+import archives.tater.necromancer.particle.NecromancerModParticles
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.ai.goal.*
@@ -112,8 +114,8 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
 
         this.navigation.stop()
 
-        world.spawnParticles(Necromancer.NECROMANCER_TELEPORT_PARTICLE_EMITTER, x, y, z, 1)
-        world.spawnParticles(Necromancer.NECROMANCER_TELEPORT_PARTICLE_EMITTER, swapTarget.x, swapTarget.y, swapTarget.z, 1)
+        world.spawnParticles(NecromancerModParticles.NECROMANCER_TELEPORT_PARTICLE_EMITTER, x, y, z, 1)
+        world.spawnParticles(NecromancerModParticles.NECROMANCER_TELEPORT_PARTICLE_EMITTER, swapTarget.x, swapTarget.y, swapTarget.z, 1)
 
         swapTarget.damage(source, amount / 2)
 
@@ -124,7 +126,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         super.tick()
         if (isCasting) {
             world.addParticle(
-                Necromancer.NECROMANCER_PARTICLE,
+                NecromancerModParticles.NECROMANCER_PARTICLE,
                 x + world.random.nextBetween(-0.7, 0.7),
                 y + world.random.nextBetween(1.2, 1.6),
                 z + world.random.nextBetween(-0.7, 0.7),

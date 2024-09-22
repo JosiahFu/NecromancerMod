@@ -1,6 +1,6 @@
 package archives.tater.necromancer.cca
 
-import archives.tater.necromancer.Necromancer
+import archives.tater.necromancer.NecromancerMod
 import dev.onyxstudios.cca.api.v3.component.Component
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistry
@@ -35,7 +35,7 @@ class NecromancedComponent(private val mob: MobEntity) : Component, AutoSyncedCo
 
         const val MAX_EMERGE_TICKS = 40
 
-        val KEY: ComponentKey<NecromancedComponent> = ComponentRegistry.getOrCreate(Necromancer.id("necromanced"), NecromancedComponent::class.java)
+        val KEY: ComponentKey<NecromancedComponent> = ComponentRegistry.getOrCreate(NecromancerMod.id("necromanced"), NecromancedComponent::class.java)
 
         @JvmStatic
         @get:JvmName("getOwnerUUID")

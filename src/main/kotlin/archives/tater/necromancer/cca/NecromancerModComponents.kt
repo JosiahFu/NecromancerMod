@@ -6,7 +6,7 @@ import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.PhantomEntity
 import net.minecraft.entity.mob.ZombieEntity
 
-object NecromancerComponents : EntityComponentInitializer {
+object NecromancerModComponents : EntityComponentInitializer {
     override fun registerEntityComponentFactories(registry: EntityComponentFactoryRegistry) {
         for (entityClass in listOf(
             ZombieEntity::class,

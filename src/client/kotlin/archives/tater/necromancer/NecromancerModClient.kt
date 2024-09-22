@@ -5,20 +5,24 @@ import archives.tater.necromancer.client.particle.NecromancerParticle
 import archives.tater.necromancer.client.particle.NecromancerSummonParticle
 import archives.tater.necromancer.client.render.entity.NecromancerEntityRenderer
 import archives.tater.necromancer.client.render.entity.model.NecromancerEntityModel
+import archives.tater.necromancer.entity.NecromancerModEntities
+import archives.tater.necromancer.particle.NecromancerModParticles
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry
 
 
-object NecromancerClient : ClientModInitializer {
+object NecromancerModClient : ClientModInitializer {
 	override fun onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
 		NecromancerEntityModel.register()
-		EntityRendererRegistry.register(Necromancer.NECROMANCER_ENTITY, ::NecromancerEntityRenderer)
+		EntityRendererRegistry.register(NecromancerModEntities.NECROMANCER, ::NecromancerEntityRenderer)
 
-		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_SUMMON_PARTICLE, NecromancerSummonParticle::Factory)
-		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_PARTICLE, NecromancerParticle::Factory)
-		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_SUMMON_PARTICLE_EMITTER, NecromancerEmitterParticle.SummonFactory())
-		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_TELEPORT_PARTICLE_EMITTER, NecromancerEmitterParticle.TeleportFactory())
+		ParticleFactoryRegistry.getInstance().apply {
+			register(NecromancerModParticles.NECROMANCER_SUMMON_PARTICLE, NecromancerSummonParticle::Factory)
+			register(NecromancerModParticles.NECROMANCER_PARTICLE, NecromancerParticle::Factory)
+			register(NecromancerModParticles.NECROMANCER_SUMMON_PARTICLE_EMITTER, NecromancerEmitterParticle.SummonFactory())
+			register(NecromancerModParticles.NECROMANCER_TELEPORT_PARTICLE_EMITTER, NecromancerEmitterParticle.TeleportFactory())
+		}
 	}
 }
