@@ -37,3 +37,9 @@ operator fun BlockPos.minus(other: Vec3d): Vec3d = toCenterPos() - other
 operator fun Vec3d.minus(other: Vec3d): Vec3d = subtract(other)
 
 fun Random.nextBetween(min: Double, max: Double) = (max - min) * nextDouble() + min
+
+fun BlockPos.horizontalSquaredDistance(other: BlockPos): Int {
+    val xDiff = this.x - other.x
+    val zDiff = this.z - other.z
+    return xDiff * xDiff + zDiff * zDiff
+}

@@ -32,5 +32,8 @@ class NecromancedEyesFeatureRenderer<T: MobEntity, M: EntityModel<T>>(context: F
 
         @JvmField
         val ZOMBIE_PIGLIN_EYES: RenderLayer = RenderLayer.getEyes(Necromancer.id("textures/entity/zombified_piglin_eyes.png"))
+
+        @JvmField
+        val ZOMBIE_VILLAGER_EYES: RenderLayer = RenderLayer.getEyes(Necromancer.id("textures/entity/zombie_villager_eyes.png"))
     }
 }

@@ -6,7 +6,8 @@
     "LivingEntityRendererMixin",
     "PiglinEntityRendererMixin",
     "SkeletonEntityRendererMixin",
-    "ZombieBaseEntityRendererMixin"
+    "ZombieBaseEntityRendererMixin",
+    "ZombieVillagerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
