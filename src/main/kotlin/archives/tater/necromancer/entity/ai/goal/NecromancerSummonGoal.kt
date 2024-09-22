@@ -111,8 +111,9 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                 refreshPositionAndAngles(pos, yaw, 0f)
                 headYaw = yaw
                 this.necromancedOwner = owner
+                owner.summons.add(this.uuid)
                 startEmerge()
-                (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_PARTICLE_EMITTER, x, y, z, 1)
+                (world as ServerWorld).spawnParticles(Necromancer.NECROMANCER_SUMMON_PARTICLE_EMITTER, x, y, z, 1)
             })
         }
 

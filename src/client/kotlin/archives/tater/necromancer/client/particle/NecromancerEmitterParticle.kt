@@ -16,16 +16,17 @@ class NecromancerEmitterParticle(
     x: Double,
     y: Double,
     z: Double,
+    private val isSummon: Boolean = false,
 ) : NoRenderParticle(clientWorld, x, y, z, 0.0, 0.0, 0.0) {
     init {
         velocityX = 0.0
         velocityY = 0.0
         velocityZ = 0.0
-        maxAge = NecromancerEntity.CAST_TIME
+        maxAge = if (isSummon) NecromancerEntity.CAST_TIME else 5
     }
 
     override fun tick() {
-        if (age == 0) {
+        if (isSummon && age == 0) {
             world.addParticle(Necromancer.NECROMANCER_SUMMON_PARTICLE, x, y, z, 0.0, 0.0, 0.0)
         }
 
@@ -44,7 +45,21 @@ class NecromancerEmitterParticle(
     }
 
     @Environment(EnvType.CLIENT)
-    class Factory: ParticleFactory<DefaultParticleType> {
+    class SummonFactory: ParticleFactory<DefaultParticleType> {
+        override fun createParticle(
+            parameters: DefaultParticleType?,
+            world: ClientWorld,
+            x: Double,
+            y: Double,
+            z: Double,
+            velocityX: Double,
+            velocityY: Double,
+            velocityZ: Double
+        ) = NecromancerEmitterParticle(world, x, y, z, true)
+    }
+
+    @Environment(EnvType.CLIENT)
+    class TeleportFactory: ParticleFactory<DefaultParticleType> {
         override fun createParticle(
             parameters: DefaultParticleType?,
             world: ClientWorld,
@@ -55,6 +70,5 @@ class NecromancerEmitterParticle(
             velocityY: Double,
             velocityZ: Double
         ) = NecromancerEmitterParticle(world, x, y, z)
-
     }
 }

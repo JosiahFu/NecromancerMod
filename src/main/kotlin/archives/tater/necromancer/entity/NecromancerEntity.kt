@@ -11,12 +11,17 @@ import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandlerRegistry
+import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.mob.AbstractSkeletonEntity
 import net.minecraft.entity.mob.MobEntity
+import net.minecraft.entity.mob.WitherSkeletonEntity
+import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.entity.passive.IronGolemEntity
 import net.minecraft.entity.passive.WolfEntity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.registry.tag.DamageTypeTags
+import net.minecraft.server.world.ServerWorld
 import net.minecraft.sound.SoundEvent
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.math.random.Random
@@ -29,6 +34,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
 
     var casting by CASTING
     var spellCooldown = 0
+    val summons = mutableListOf<UUID>()
 
     val isCasting
         get() = isAlive && casting > 0
@@ -61,17 +67,58 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         super.writeCustomDataToNbt(nbt)
         nbt.putInt(NBT_CASTING, casting)
         nbt.putInt(NBT_COOLDOWN, spellCooldown)
+        nbt.putUuidList(NBT_SUMMONS, summons)
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
         casting = nbt.getInt(NBT_CASTING)
         spellCooldown = nbt.getInt(NBT_COOLDOWN)
+        summons.clear()
+        summons.addAll(nbt.getUuidList(NBT_SUMMONS))
     }
 
     override fun updateAttackType() {}
 
     override fun isTeammate(other: Entity): Boolean = super.isTeammate(other) || (other as? MobEntity)?.hasNecromancedOwner == true
+
+    override fun damage(source: DamageSource, amount: Float): Boolean {
+        if (world.isClient || isDead || isInvulnerableTo(source) || source.attacker == null || (source.isIn(
+                DamageTypeTags.IS_FIRE
+            ) && this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))) return super.damage(source, amount)
+
+        val world = world as ServerWorld
+
+        val swapTarget = summons.shuffled().mapNotNull { uuid -> world.getEntity(uuid)?.takeIf { it.isAlive && it.isOnGround } }.let { entities ->
+            entities
+                .filter { it is ZombieEntity || it is WitherSkeletonEntity }
+                .ifEmpty { entities }
+                .maxByOrNull { source.attacker!!.squaredDistanceTo(it) }
+        } ?: return super.damage(source, amount)
+
+        val superResult = super.damage(source, amount / 2)
+
+        if (isDead) return superResult
+
+        val selfPos = pos
+        val selfYaw = yaw
+        val selfPitch = pitch
+
+        this.updatePositionAndAngles(swapTarget.x, swapTarget.y, swapTarget.z, swapTarget.yaw, swapTarget.pitch)
+        swapTarget.updatePositionAndAngles(selfPos.x, selfPos.y, selfPos.z, selfYaw, selfPitch)
+
+        this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
+        swapTarget.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
+
+        this.navigation.stop()
+
+        world.spawnParticles(Necromancer.NECROMANCER_TELEPORT_PARTICLE_EMITTER, x, y, z, 1)
+        world.spawnParticles(Necromancer.NECROMANCER_TELEPORT_PARTICLE_EMITTER, swapTarget.x, swapTarget.y, swapTarget.z, 1)
+
+        swapTarget.damage(source, amount / 2)
+
+        return superResult
+    }
 
     override fun tick() {
         super.tick()
@@ -104,6 +151,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
 
         const val NBT_CASTING = "Casting"
         const val NBT_COOLDOWN = "SpellCooldown"
+        const val NBT_SUMMONS = "Summons"
 
         const val CAST_TIME = 40
         const val COOLDOWN_TIME = 300

@@ -33,7 +33,8 @@ object Necromancer : ModInitializer {
 
 	val NECROMANCER_PARTICLE: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer"), FabricParticleTypes.simple())
 	val NECROMANCER_SUMMON_PARTICLE: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer_summon"), FabricParticleTypes.simple())
-	val NECROMANCER_PARTICLE_EMITTER: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer_emitter"), FabricParticleTypes.simple())
+	val NECROMANCER_SUMMON_PARTICLE_EMITTER: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer_summon_emitter"), FabricParticleTypes.simple())
+	val NECROMANCER_TELEPORT_PARTICLE_EMITTER: DefaultParticleType = Registry.register(Registries.PARTICLE_TYPE, id("necromancer_teleport_emitter"), FabricParticleTypes.simple())
 
 	override fun onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.

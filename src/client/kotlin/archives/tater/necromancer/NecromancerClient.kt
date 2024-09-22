@@ -18,6 +18,7 @@ object NecromancerClient : ClientModInitializer {
 
 		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_SUMMON_PARTICLE, NecromancerSummonParticle::Factory)
 		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_PARTICLE, NecromancerParticle::Factory)
-		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_PARTICLE_EMITTER, NecromancerEmitterParticle.Factory())
+		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_SUMMON_PARTICLE_EMITTER, NecromancerEmitterParticle.SummonFactory())
+		ParticleFactoryRegistry.getInstance().register(Necromancer.NECROMANCER_TELEPORT_PARTICLE_EMITTER, NecromancerEmitterParticle.TeleportFactory())
 	}
 }

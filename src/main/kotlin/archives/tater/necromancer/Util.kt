@@ -4,6 +4,10 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandler
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtElement
+import net.minecraft.nbt.NbtHelper
+import net.minecraft.nbt.NbtList
 import net.minecraft.particle.ParticleEffect
 import net.minecraft.registry.entry.RegistryEntry
 import net.minecraft.registry.tag.TagKey
@@ -11,6 +15,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.random.Random
+import java.util.*
 import kotlin.reflect.KProperty
 
 operator fun <T> TrackedData<T>.getValue(thisRef: Entity, property: KProperty<*>): T = thisRef.dataTracker.get(this)
@@ -43,3 +48,10 @@ fun BlockPos.horizontalSquaredDistance(other: BlockPos): Int {
     val zDiff = this.z - other.z
     return xDiff * xDiff + zDiff * zDiff
 }
+
+fun Iterable<NbtElement>.toNbtList() = NbtList().apply { this@toNbtList.forEach(::add) }
+
+fun NbtCompound.putUuidList(key: String, uuids: Iterable<UUID>) {
+    put(key, uuids.map(NbtHelper::fromUuid).toNbtList())
+}
+fun NbtCompound.getUuidList(key: String): List<UUID> = getList(key, NbtElement.INT_ARRAY_TYPE.toInt()).map(NbtHelper::toUuid)
