@@ -23,9 +23,9 @@ import kotlin.math.pow
 
 class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
 
-    override fun canStart(): Boolean = owner.target?.isAlive ?: false && !owner.isCasting && owner.spellCooldown == 0
+    override fun canStart(): Boolean = owner.target?.isAlive ?: false && !owner.isCasting && owner.spellCooldown == 0 && owner.castsLeft > 0
 
-    override fun shouldContinue(): Boolean = owner.target?.isAlive ?: false && owner.spellCooldown == 0
+    override fun shouldContinue(): Boolean = owner.target?.isAlive ?: false && owner.spellCooldown == 0 && owner.castsLeft > 0
 
     override fun start() {
         owner.casting = NecromancerEntity.CAST_TIME
@@ -34,9 +34,11 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
     }
 
     override fun tick() {
-        if (owner.isCasting) return
-        summonMobs()
-        owner.spellCooldown = NecromancerEntity.COOLDOWN_TIME
+        if (!owner.isCasting) summonMobs()
+    }
+
+    override fun stop() {
+        owner.casting = 0
     }
 
     private fun summonMobs() {
@@ -99,6 +101,10 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
             if (cost > MAX_SUMMON_COST) break
         }
 
+        if (summons.isEmpty()) {
+            return
+        }
+
         for ((pos, type) in summons) {
             val posDiff = owner.target!!.pos - pos.toCenterPos()
             val yaw = MathHelper.atan2(posDiff.z, posDiff.x).toFloat() * MathHelper.DEGREES_PER_RADIAN - 90
@@ -115,6 +121,8 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
         }
 
         owner.playSound(SoundEvents.ENTITY_EVOKER_CAST_SPELL, 1.0f, 1.0f)
+        owner.castsLeft--
+        owner.spellCooldown = NecromancerEntity.COOLDOWN_TIME
     }
 
     companion object {

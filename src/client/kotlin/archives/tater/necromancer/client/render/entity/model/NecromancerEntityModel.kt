@@ -104,7 +104,7 @@ class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<Necroma
             }.let { TexturedModelData.of(it, 64, 64) }
 
         fun register() {
-            EntityModelLayerRegistry.registerModelLayer(LAYER, Companion::texturedModelData)
+            EntityModelLayerRegistry.registerModelLayer(LAYER, ::texturedModelData)
         }
     }
 }
