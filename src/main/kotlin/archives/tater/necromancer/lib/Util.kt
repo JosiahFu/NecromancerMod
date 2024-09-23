@@ -25,6 +25,7 @@ import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.util.math.random.Random
+import org.slf4j.Logger
 import java.util.*
 import kotlin.reflect.KProperty
 
@@ -69,3 +70,14 @@ fun NbtCompound.putUuidList(key: String, uuids: Iterable<UUID>) {
     put(key, uuids.map(NbtHelper::fromUuid).toNbtList())
 }
 fun NbtCompound.getUuidList(key: String): List<UUID> = getList(key, NbtElement.INT_ARRAY_TYPE.toInt()).map(NbtHelper::toUuid)
+
+fun MutableList<Entity>.trimNonAlive() {
+    removeIf { !it.isAlive }
+}
+
+fun <T> Logger.measure(name: String = "method", block: () -> T): T {
+    val startTime = System.currentTimeMillis()
+    return block().also {
+        info("Running $name took ${System.currentTimeMillis() - startTime} milliseconds")
+    }
+}

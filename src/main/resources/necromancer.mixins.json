@@ -5,6 +5,7 @@
   "mixins": [
     "AbstractSkeletonEntityMixin",
     "EntityMixin",
+    "LivingEntityMixin",
     "MobEntityMixin",
     "PhantomEntityMixin",
     "ZombieEntityMixin"

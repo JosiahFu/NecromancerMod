@@ -1,5 +1,6 @@
 package archives.tater.necromancer.entity.ai.goal
 
+import archives.tater.necromancer.NecromancerMod
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.necromancedOwner
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.startEmerge
 import archives.tater.necromancer.entity.NecromancerEntity
@@ -47,6 +48,17 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
         val summons = mutableMapOf<BlockPos, EntityType<out MobEntity>>()
         var cost = 0
 
+        fun structureWithin(structure: TagKey<Structure>, distance: Int) =
+            NecromancerMod.logger.measure("locate ${structure.id}") {
+                serverWorld.locateStructure(structure, owner.blockPos, 0, false)
+            }?.let {
+                it.horizontalSquaredDistance(owner.blockPos) <= distance * distance
+            } ?: false
+
+        val nearVillage by lazy { structureWithin(StructureTags.VILLAGE, 64) }
+        val nearFortress by lazy { structureWithin(NecromancerModTags.Structure.SPAWNS_WITHER_SKELETON, 48) }
+
+
         for (i in 0..<16) {
             attempts@ for (j in 0..<16) { // 16 attempts
                 val x = owner.blockPos.x + owner.random.nextBetween(-2, 2)
@@ -59,11 +71,6 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                 val biome = owner.world.getBiome(blockPos)
                 val skyAccess = owner.world.isSkyVisible(blockPos)
 
-                fun structureWithin(structure: TagKey<Structure>, distance: Int) =
-                    serverWorld.locateStructure(structure, blockPos, 1, false)?.let {
-                        it.horizontalSquaredDistance(blockPos) <= distance * distance
-                    } ?: false
-
                 val type: EntityType<out MobEntity> = when {
                     distance > 24.0.pow(2) && skyAccess -> EntityType.PHANTOM
 
@@ -72,11 +79,11 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                         else -> EntityType.SKELETON
                     }
 
-                    structureWithin(NecromancerModTags.Structure.SPAWNS_WITHER_SKELETON, 32) -> EntityType.WITHER_SKELETON
+                    nearFortress -> EntityType.WITHER_SKELETON
                     biome in NecromancerModTags.Biome.SPAWNS_HUSK && skyAccess -> EntityType.HUSK
                     biome in NecromancerModTags.Biome.SPAWNS_DROWNED || owner.world.getFluidState(blockPos) isOf Fluids.WATER -> EntityType.DROWNED
                     biome in NecromancerModTags.Biome.SPAWNS_ZOMBIE_PIGLIN -> EntityType.ZOMBIFIED_PIGLIN
-                    structureWithin(StructureTags.VILLAGE, 32) -> EntityType.ZOMBIE_VILLAGER
+                    nearVillage -> EntityType.ZOMBIE_VILLAGER
                     else -> EntityType.ZOMBIE
                 }
 
@@ -114,7 +121,8 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                 refreshPositionAndAngles(pos, yaw, 0f)
                 headYaw = yaw
                 this.necromancedOwner = owner
-                owner.summons.add(this.uuid)
+                owner.summons.trimNonAlive()
+                owner.summons.add(this)
                 startEmerge()
                 (world as ServerWorld).spawnParticles(NecromancerModParticles.NECROMANCER_SUMMON_PARTICLE_EMITTER, x, y, z, 1)
             })

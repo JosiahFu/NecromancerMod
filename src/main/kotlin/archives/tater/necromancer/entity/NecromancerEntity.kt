@@ -2,13 +2,11 @@ package archives.tater.necromancer.entity
 
 import archives.tater.necromancer.*
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.hasNecromancedOwner
+import archives.tater.necromancer.duck.DeathAvoider
 import archives.tater.necromancer.entity.ai.goal.NecromancerSummonGoal
 import archives.tater.necromancer.lib.*
 import archives.tater.necromancer.particle.NecromancerModParticles
-import net.minecraft.entity.Entity
-import net.minecraft.entity.EntityData
-import net.minecraft.entity.EntityType
-import net.minecraft.entity.SpawnReason
+import net.minecraft.entity.*
 import net.minecraft.entity.ai.goal.*
 import net.minecraft.entity.attribute.DefaultAttributeContainer
 import net.minecraft.entity.attribute.EntityAttributes
@@ -37,11 +35,11 @@ import net.minecraft.world.World
 import java.util.*
 
 class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: World) :
-    AbstractSkeletonEntity(entityType, world) {
+    AbstractSkeletonEntity(entityType, world), DeathAvoider {
 
     var casting by CASTING
     var spellCooldown = 0
-    val summons = mutableListOf<UUID>()
+    val summons = mutableListOf<Entity>()
     var castsLeft = MAX_CASTS
     var castRecharge = CAST_RECHARGE_TIME
 
@@ -80,15 +78,17 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         super.writeCustomDataToNbt(nbt)
         nbt.putInt(NBT_CASTING, casting)
         nbt.putInt(NBT_COOLDOWN, spellCooldown)
-        nbt.putUuidList(NBT_SUMMONS, summons)
+        nbt.putUuidList(NBT_SUMMONS, summons.filter { it.isAlive }.map { it.uuid })
     }
 
     override fun readCustomDataFromNbt(nbt: NbtCompound) {
         super.readCustomDataFromNbt(nbt)
         casting = nbt.getInt(NBT_CASTING)
         spellCooldown = nbt.getInt(NBT_COOLDOWN)
-        summons.clear()
-        summons.addAll(nbt.getUuidList(NBT_SUMMONS))
+        if (!world.isClient) {
+            summons.clear()
+            summons.addAll(nbt.getUuidList(NBT_SUMMONS).mapNotNull { (world as ServerWorld).getEntity(it)?.takeIf(Entity::isAlive) })
+        }
     }
 
     override fun initialize(
@@ -115,6 +115,8 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         if (world.isClient || isDead || ignoresSwap(source))
             return super.damage(source, amount)
 
+        swapDeath = false
+
         if (!super.damage(source, amount / 2)) return false
 
         if (isDead && !swapDeath) return true
@@ -124,30 +126,26 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
             swapWith(it)
         }
 
-        swapDeath = false
-
         return true
     }
 
-    override fun onDeath(damageSource: DamageSource) {
-        val world = world as? ServerWorld ?: return super.onDeath(damageSource)
-        if (!ignoresSwap(damageSource) && summons.any { uuid -> world.getEntity(uuid)?.let { it.isAlive && it.isOnGround } == true }) {
-            health = 0.1f
+    override fun shouldAvoidDeath(source: DamageSource): Boolean {
+        if (!ignoresSwap(source) && summons.any {  it.isAlive && it.isOnGround }) {
             swapDeath = true
-        } else
-            super.onDeath(damageSource)
+            return true
+        }
+        return false
     }
 
     private fun ignoresSwap(source: DamageSource): Boolean =
         isInvulnerableTo(source) || source.attacker == null || source in DamageTypeTags.BYPASSES_INVULNERABILITY || (source in DamageTypeTags.IS_FIRE && this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))
 
     private fun findSwapTarget(): Entity? {
-        val world = world as? ServerWorld ?: return null
-        return summons.shuffled().mapNotNull { uuid -> world.getEntity(uuid)?.takeIf { it.isAlive && it.isOnGround } }.let { entities ->
+        return summons.filter { it.isAlive && it.isOnGround }.let { entities ->
             entities
                 .filter { it is ZombieEntity || it is WitherSkeletonEntity }
                 .ifEmpty { entities }
-                .maxByOrNull { health }
+                .maxByOrNull { (it as LivingEntity).health }
         }
     }
 
