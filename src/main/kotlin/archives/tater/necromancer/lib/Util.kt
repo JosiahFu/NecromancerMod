@@ -40,6 +40,7 @@ inline fun <reified E: Entity, T> trackedData(handler: TrackedDataHandler<T>): T
 
 inline operator fun <T> TagKey<T>.contains(entry: RegistryEntry<T>) = entry.isIn(this)
 inline operator fun TagKey<DamageType>.contains(entry: DamageSource) = entry.isIn(this)
+inline operator fun TagKey<Fluid>.contains(entry: FluidState) = entry.isIn(this)
 inline infix fun ItemStack.isOf(item: Item) = isOf(item)
 inline infix fun FluidState.isOf(fluid: Fluid) = isOf(fluid)
 inline infix fun BlockState.isOf(block: Block) = isOf(block)

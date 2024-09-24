@@ -10,8 +10,13 @@ import archives.tater.necromancer.tag.NecromancerModTags
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.goal.Goal
+import net.minecraft.entity.effect.StatusEffectInstance
+import net.minecraft.entity.effect.StatusEffects
 import net.minecraft.entity.mob.MobEntity
+import net.minecraft.entity.mob.ZombieEntity
+import net.minecraft.entity.mob.ZombifiedPiglinEntity
 import net.minecraft.fluid.Fluids
+import net.minecraft.registry.tag.FluidTags
 import net.minecraft.registry.tag.StructureTags
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.world.ServerWorld
@@ -81,7 +86,7 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
 
                     nearFortress -> EntityType.WITHER_SKELETON
                     biome in NecromancerModTags.Biome.SPAWNS_HUSK && skyAccess -> EntityType.HUSK
-                    biome in NecromancerModTags.Biome.SPAWNS_DROWNED || owner.world.getFluidState(blockPos) isOf Fluids.WATER -> EntityType.DROWNED
+                    biome in NecromancerModTags.Biome.SPAWNS_DROWNED || owner.world.getFluidState(blockPos) in FluidTags.WATER -> EntityType.DROWNED
                     biome in NecromancerModTags.Biome.SPAWNS_ZOMBIE_PIGLIN -> EntityType.ZOMBIFIED_PIGLIN
                     nearVillage -> EntityType.ZOMBIE_VILLAGER
                     else -> EntityType.ZOMBIE
@@ -121,6 +126,9 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                 refreshPositionAndAngles(pos, yaw, 0f)
                 headYaw = yaw
                 this.necromancedOwner = owner
+                if (this is ZombieEntity && this !is ZombifiedPiglinEntity) {
+                    addStatusEffect(StatusEffectInstance(StatusEffects.SPEED, -1, 0, false, false))
+                }
                 owner.summons.trimNonAlive()
                 owner.summons.add(this)
                 startEmerge()
@@ -137,11 +145,11 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
         const val MAX_SUMMON_COST = 60
         val SUMMON_COSTS = mapOf(
             EntityType.PHANTOM to 40,
-            EntityType.ZOMBIE to 10,
-            EntityType.ZOMBIE_VILLAGER to 12,
-            EntityType.HUSK to 12,
+            EntityType.ZOMBIE to 12,
+            EntityType.ZOMBIE_VILLAGER to 15,
+            EntityType.HUSK to 15,
             EntityType.DROWNED to 15,
-            EntityType.ZOMBIFIED_PIGLIN to 15,
+            EntityType.ZOMBIFIED_PIGLIN to 17,
             EntityType.SKELETON to 25,
             EntityType.STRAY to 30,
             EntityType.WITHER_SKELETON to 40,
