@@ -2,8 +2,8 @@ package archives.tater.necromancer.client.render.entity.model
 
 import archives.tater.necromancer.NecromancerMod
 import archives.tater.necromancer.client.lib.ModelPartBuilder
+import archives.tater.necromancer.client.lib.cuboid
 import archives.tater.necromancer.entity.NecromancerEntity
-import com.google.common.collect.Iterables
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry
@@ -11,83 +11,146 @@ import net.minecraft.client.model.Dilation
 import net.minecraft.client.model.ModelPart
 import net.minecraft.client.model.ModelTransform
 import net.minecraft.client.model.TexturedModelData
-import net.minecraft.client.render.entity.model.BipedEntityModel
-import net.minecraft.client.render.entity.model.EntityModelLayer
-import net.minecraft.client.render.entity.model.EntityModelPartNames
-import net.minecraft.client.render.entity.model.SkeletonEntityModel
+import net.minecraft.client.render.entity.model.*
 import net.minecraft.util.math.MathHelper.PI
 import net.minecraft.util.math.MathHelper.cos
 
 @Environment(EnvType.CLIENT)
 class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<NecromancerEntity>(modelPart) {
-    private val jacket: ModelPart = modelPart.getChild(EntityModelPartNames.JACKET)
-
-    override fun getBodyParts(): MutableIterable<ModelPart> {
-        return Iterables.concat(super.getBodyParts(), listOf(jacket))
-    }
-
-    override fun setVisible(visible: Boolean) {
-        super.setVisible(visible)
-        jacket.visible = visible
-    }
-
     override fun setAngles(mobEntity: NecromancerEntity, limbAngle: Float, limbDistance: Float, animationProgress: Float, headYaw: Float, headPitch: Float) {
         super.setAngles(mobEntity, limbAngle, limbDistance, animationProgress, headYaw, headPitch)
-        jacket.copyTransform(body)
         if (mobEntity.isCasting) {
-            rightArm.yaw = - PI / 2
-            rightArm.roll = 0f
-            rightArm.pitch = cos(animationProgress * 0.5f) * 0.5f + PI / 2 + 0.5f
-            leftArm.yaw = PI / 2
-            leftArm.roll = 0f
-            leftArm.pitch = cos(animationProgress * 0.5f) * 0.5f + PI / 2 + 0.5f
+            rightArm.yaw = PI / 2
+            rightArm.pitch = 0f
+            rightArm.roll = cos(animationProgress * 0.4f) * 0.5f + PI / 2 + 0.5f
+            leftArm.yaw = -PI / 2
+            leftArm.pitch = 0f
+            leftArm.roll = -(cos(animationProgress * 0.4f) * 0.5f + PI / 2 + 0.5f)
         }
     }
 
     @Environment(EnvType.CLIENT)
     companion object {
         val LAYER = EntityModelLayer(NecromancerMod.id("necromancer"), "main")
+        val INNER_ARMOR_LAYER = EntityModelLayer(NecromancerMod.id("necromancer"), "inner_armor")
+        val OUTER_ARMOR_LAYER = EntityModelLayer(NecromancerMod.id("necromancer"), "outer_armor")
 
         val texturedModelData: TexturedModelData
             get() = BipedEntityModel.getModelData(Dilation.NONE, 0f).apply {
                 root.apply {
                     addChild(
-                        EntityModelPartNames.JACKET,
+                        EntityModelPartNames.BODY,
                         ModelPartBuilder {
-                            uv(16, 32)
-                            cuboid(-4.0F, 0.0F, -2.0F, 8.0F, 24.0F, 4.0F, Dilation(0.5F))
+                            cuboid(
+                                uvX = 16,
+                                uvY = 16,
+
+                                offsetX = -4.0f,
+                                offsetY = 0.0f,
+                                offsetZ = -2.0f,
+
+                                sizeX = 8.0f,
+                                sizeY = 12.0f,
+                                sizeZ = 4.0f,
+                            )
+
+                            cuboid(
+                                uvX = 16,
+                                uvY = 32,
+
+                                offsetX = -4.0F,
+                                offsetY = 0.0F,
+                                offsetZ = -2.0F,
+
+                                sizeX = 8.0F,
+                                sizeY = 24.0F,
+                                sizeZ = 4.0F,
+                                extra = 0.55f
+                            )
                         },
-                        ModelTransform.pivot(0.0F, -12.0F, 0.0F)
+                        ModelTransform.pivot(0.0F, 0.0F, 0.0F)
                     )
                     addChild(
                         EntityModelPartNames.RIGHT_ARM,
                         ModelPartBuilder {
-                            uv(40, 16)
-                            cuboid(-1.0f, -2.0f, -1.0f, 2.0f, 12.0f, 2.0f)
+                            cuboid(
+                                uvX = 40,
+                                uvY = 16,
 
-                            uv(40, 32)
-                            cuboid(-1.0F, -2.0F, -1.0F, 2.0F, 12.0F, 2.0F, Dilation(0.5F))
+                                offsetX = -1.0f,
+                                offsetY = -1.0f,
+                                offsetZ = -1.0f,
+
+                                sizeX = 2.0f,
+                                sizeY = 12.0f,
+                                sizeZ = 2.0f,
+                            )
+
+                            cuboid(
+                                uvX = 40,
+                                uvY = 32,
+
+                                offsetX = -1.0F,
+                                offsetY = -1.0F,
+                                offsetZ = -1.0F,
+
+                                sizeX = 2.0F,
+                                sizeY = 12.0F,
+                                sizeZ = 2.0F,
+                                extra = 0.5f
+                            )
                         },
-                        ModelTransform.pivot(-5.0f, 2.0f, 0.0f)
+                        ModelTransform.pivot(-5.0f, 1.0f, 0.0f)
                     )
                     addChild(
                         EntityModelPartNames.LEFT_ARM,
                         ModelPartBuilder {
-                            uv(40, 16)
-                            mirrored()
-                            cuboid(-1.0f, -2.0f, -1.0f, 2.0f, 12.0f, 2.0f)
+                            cuboid(
+                                uvX = 40,
+                                uvY = 16,
+                                mirrored = true,
 
-                            uv(0, 32)
-                            mirrored()
-                            cuboid(-1.0F, -2.0F, -1.0F, 2.0F, 12.0F, 2.0F, Dilation(0.5F))
+                                offsetX = -1.0f,
+                                offsetY = -1.0f,
+                                offsetZ = -1.0f,
+
+                                sizeX = 2.0f,
+                                sizeY = 12.0f,
+                                sizeZ = 2.0f,
+                            )
+
+                            cuboid(
+                                uvX = 0,
+                                uvY = 32,
+                                mirrored = true,
+
+                                offsetX = -1.0F,
+                                offsetY = -1.0F,
+                                offsetZ = -1.0F,
+
+                                sizeX = 2.0F,
+                                sizeY = 12.0F,
+                                sizeZ = 2.0F,
+                                extra = 0.5f,
+                            )
                         },
-                        ModelTransform.pivot(5.0f, 2.0f, 0.0f)
+                        ModelTransform.pivot(5.0f, 1.0f, 0.0f)
                     )
                     addChild(
                         EntityModelPartNames.RIGHT_LEG,
                         ModelPartBuilder {
-                            uv(0, 16)
-                            cuboid(-1.0f, 0.0f, -1.0f, 2.0f, 12.0f, 2.0f)
+                            cuboid(
+                                uvX = 0,
+                                uvY = 16,
+
+                                offsetX = -1.0f,
+                                offsetY = 0.0f,
+                                offsetZ = -1.0f,
+
+                                sizeX = 2.0f,
+                                sizeY = 12.0f,
+                                sizeZ = 2.0f,
+                            )
                         },
                         ModelTransform.pivot(-2.0f, 12.0f, 0.0f)
                     )
@@ -96,7 +159,19 @@ class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<Necroma
                         ModelPartBuilder {
                             uv(0, 16)
                             mirrored()
-                            cuboid(-1.0f, 0.0f, -1.0f, 2.0f, 12.0f, 2.0f)
+                            cuboid(
+                                uvX = 0,
+                                uvY = 16,
+                                mirrored = true,
+
+                                offsetX = -1.0f,
+                                offsetY = 0.0f,
+                                offsetZ = -1.0f,
+
+                                sizeX = 2.0f,
+                                sizeY = 12.0f,
+                                sizeZ = 2.0f
+                            )
                         },
                         ModelTransform.pivot(2.0f, 12.0f, 0.0f)
                     )
@@ -105,6 +180,8 @@ class NecromancerEntityModel(modelPart: ModelPart) : SkeletonEntityModel<Necroma
 
         fun register() {
             EntityModelLayerRegistry.registerModelLayer(LAYER, ::texturedModelData)
+            EntityModelLayerRegistry.registerModelLayer(INNER_ARMOR_LAYER) { TexturedModelData.of(ArmorEntityModel.getModelData(Dilation(0.5F)), 64, 32) }
+            EntityModelLayerRegistry.registerModelLayer(OUTER_ARMOR_LAYER) { TexturedModelData.of(ArmorEntityModel.getModelData(Dilation(1.0F)), 64, 32) }
         }
     }
 }

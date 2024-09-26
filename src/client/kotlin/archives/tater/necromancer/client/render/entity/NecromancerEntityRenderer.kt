@@ -8,6 +8,7 @@ import net.fabricmc.api.Environment
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.entity.BipedEntityRenderer
 import net.minecraft.client.render.entity.EntityRendererFactory.Context
+import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer
 import net.minecraft.client.render.entity.feature.EyesFeatureRenderer
 import net.minecraft.client.render.entity.model.EntityModelLayer
 import net.minecraft.client.util.math.MatrixStack
@@ -17,14 +18,22 @@ import net.minecraft.util.Identifier
 class NecromancerEntityRenderer(
     ctx: Context,
     layer: EntityModelLayer,
+    legArmorLayer: EntityModelLayer,
+    bodyArmorLayer: EntityModelLayer,
 ) : BipedEntityRenderer<NecromancerEntity, NecromancerEntityModel>(ctx, NecromancerEntityModel(ctx.getPart(layer)), 0.5f) {
     init {
+        addFeature(ArmorFeatureRenderer(
+            this,
+            NecromancerEntityModel(ctx.getPart(legArmorLayer)),
+            NecromancerEntityModel(ctx.getPart(bodyArmorLayer)),
+            ctx.modelManager
+        ))
         addFeature(object : EyesFeatureRenderer<NecromancerEntity, NecromancerEntityModel>(this) {
             override fun getEyesTexture() = EYES_TEXTURE
         })
     }
 
-    constructor(ctx: Context) : this(ctx, NecromancerEntityModel.LAYER)
+    constructor(ctx: Context) : this(ctx, NecromancerEntityModel.LAYER, NecromancerEntityModel.INNER_ARMOR_LAYER, NecromancerEntityModel.OUTER_ARMOR_LAYER)
 
     override fun getTexture(entity: NecromancerEntity?): Identifier = TEXTURE
 

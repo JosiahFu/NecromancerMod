@@ -10,8 +10,8 @@ import archives.tater.necromancer.tag.NecromancerModTags
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.SpawnReason
 import net.minecraft.entity.ai.goal.Goal
-import net.minecraft.entity.effect.StatusEffectInstance
-import net.minecraft.entity.effect.StatusEffects
+import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.entity.mob.ZombifiedPiglinEntity
@@ -25,6 +25,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.gen.structure.Structure
+import java.util.*
 import kotlin.math.pow
 
 class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
@@ -126,9 +127,8 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
                 refreshPositionAndAngles(pos, yaw, 0f)
                 headYaw = yaw
                 this.necromancedOwner = owner
-                if (this is ZombieEntity && this !is ZombifiedPiglinEntity) {
-                    addStatusEffect(StatusEffectInstance(StatusEffects.SPEED, -1, 0, false, false))
-                }
+                if (this is ZombieEntity && this !is ZombifiedPiglinEntity && !this.isBaby)
+                    attributes.getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED)?.addPersistentModifier(ZOMBIE_SPEED_BOOST)
                 owner.summons.trimNonAlive()
                 owner.summons.add(this)
                 startEmerge()
@@ -155,5 +155,6 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
             EntityType.WITHER_SKELETON to 40,
         )
 
+        val ZOMBIE_SPEED_BOOST = EntityAttributeModifier(UUID.fromString("79603b64-e46a-4244-8f98-2582e035c03e"), "attribute.necromancermod.zombie_speed_boost", 0.1, EntityAttributeModifier.Operation.MULTIPLY_TOTAL)
     }
 }
