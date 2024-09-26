@@ -7,7 +7,7 @@ import net.minecraft.entity.ai.goal.TrackTargetGoal
 import net.minecraft.entity.mob.HostileEntity
 import net.minecraft.entity.mob.MobEntity
 
-class AttackWithNecromancerGoal(mob: MobEntity) : TrackTargetGoal(mob, false) {
+class AttackWithNecromancerGoal(mob: MobEntity) : TrackTargetGoal(mob, false, false) {
     private var attacking: LivingEntity? = null
 
     override fun canStart(): Boolean {

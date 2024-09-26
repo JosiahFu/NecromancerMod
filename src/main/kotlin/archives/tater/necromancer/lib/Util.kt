@@ -5,11 +5,13 @@ package archives.tater.necromancer.lib
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.entity.Entity
+import net.minecraft.entity.ai.pathing.EntityNavigation
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.entity.damage.DamageType
 import net.minecraft.entity.data.DataTracker
 import net.minecraft.entity.data.TrackedData
 import net.minecraft.entity.data.TrackedDataHandler
+import net.minecraft.entity.mob.PathAwareEntity
 import net.minecraft.fluid.Fluid
 import net.minecraft.fluid.FluidState
 import net.minecraft.item.Item
@@ -62,7 +64,7 @@ fun Random.nextBetween(min: Double, max: Double) = (max - min) * nextDouble() + 
 fun BlockPos.horizontalSquaredDistance(other: BlockPos): Int {
     val xDiff = this.x - other.x
     val zDiff = this.z - other.z
-    return xDiff * xDiff + zDiff * zDiff
+    return xDiff.squared() + zDiff.squared()
 }
 
 fun Iterable<NbtElement>.toNbtList() = NbtList().apply { this@toNbtList.forEach(::add) }
@@ -82,3 +84,9 @@ fun <T> Logger.measure(name: String = "method", block: () -> T): T {
         info("Running $name took ${System.currentTimeMillis() - startTime} milliseconds")
     }
 }
+
+inline val PathAwareEntity.effectiveNavigation: EntityNavigation get() = navigation
+
+inline fun Int.squared() = this * this
+inline fun Float.squared() = this * this
+inline fun Double.squared() = this * this

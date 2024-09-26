@@ -4,6 +4,7 @@ import archives.tater.necromancer.*
 import archives.tater.necromancer.cca.NecromancedComponent.Companion.hasNecromancedOwner
 import archives.tater.necromancer.duck.DeathAvoider
 import archives.tater.necromancer.entity.ai.goal.NecromancerSummonGoal
+import archives.tater.necromancer.entity.ai.goal.UnforgettingActiveTargetGoal
 import archives.tater.necromancer.lib.*
 import archives.tater.necromancer.particle.NecromancerModParticles
 import net.minecraft.entity.*
@@ -64,11 +65,12 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         goalSelector.add(2, LookAtCastTargetGoal())
         goalSelector.add(3, NecromancerSummonGoal(this))
         goalSelector.add(3, EscapeSunlightGoal(this, 1.0))
-        goalSelector.add(4, WatchTargetGoal())
+        goalSelector.add(5, FollowTargetGoal(16f, 40f, 1.2, 1.4))
+        goalSelector.add(5, WatchTargetGoal())
         goalSelector.add(5, WanderAroundFarGoal(this, 1.0))
         goalSelector.add(6, LookAtEntityGoal(this, PlayerEntity::class.java, 8.0f))
         goalSelector.add(6, LookAroundGoal(this))
-        targetSelector.add(1, ActiveTargetGoal(this, PlayerEntity::class.java, false))
+        targetSelector.add(1, UnforgettingActiveTargetGoal(this, PlayerEntity::class.java, false))
         targetSelector.add(2, ActiveTargetGoal(this, IronGolemEntity::class.java, false))
         targetSelector.add(3, ActiveTargetGoal(this, WolfEntity::class.java, false))
         targetSelector.add(4, RevengeGoal(this))
@@ -100,6 +102,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
     ): EntityData? {
         return super.initialize(world, difficulty, spawnReason, entityData, entityNbt).also {
             setCanPickUpLoot(false)
+            setPersistent()
         }
     }
 
@@ -130,7 +133,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
     }
 
     override fun shouldAvoidDeath(source: DamageSource): Boolean {
-        if (!ignoresSwap(source) && summons.any {  it.isAlive && it.isOnGround }) {
+        if (!ignoresSwap(source) && summons.any(::canSwapWith)) {
             swapDeath = true
             return true
         }
@@ -140,8 +143,11 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
     private fun ignoresSwap(source: DamageSource): Boolean =
         isInvulnerableTo(source) || source.attacker == null || source in DamageTypeTags.BYPASSES_INVULNERABILITY || (source in DamageTypeTags.IS_FIRE && this.hasStatusEffect(StatusEffects.FIRE_RESISTANCE))
 
+    private fun canSwapWith(entity: Entity): Boolean =
+        entity.isAlive && (entity.isOnGround || entity.isInsideWaterOrBubbleColumn)
+
     private fun findSwapTarget(): Entity? {
-        return summons.filter { it.isAlive && it.isOnGround }.let { entities ->
+        return summons.filter(::canSwapWith).let { entities ->
             entities
                 .filter { it is ZombieEntity || it is WitherSkeletonEntity }
                 .ifEmpty { entities }
@@ -163,7 +169,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         swapTarget.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
         this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1f, 1f)
 
-        this.navigation.stop()
+        this.effectiveNavigation.stop()
 
         world.spawnParticles(NecromancerModParticles.NECROMANCER_TELEPORT_PARTICLE_EMITTER, x, y, z, 1)
         world.spawnParticles(NecromancerModParticles.NECROMANCER_TELEPORT_PARTICLE_EMITTER, swapPos!!.x, swapPos!!.y, swapPos!!.z, 1)
@@ -241,7 +247,7 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         }
 
         override fun start() {
-            navigation.stop()
+            effectiveNavigation.stop()
         }
 
         override fun tick() {
@@ -260,6 +266,39 @@ class NecromancerEntity(entityType: EntityType<out NecromancerEntity>, world: Wo
         override fun tick() {
             if (target != null)
                 lookControl.lookAt(target, maxHeadRotation.toFloat(), maxLookPitchChange.toFloat())
+        }
+    }
+
+    inner class FollowTargetGoal(private val maxDistance: Float, private val farDistance: Float, private val normalSpeed: Double, private val farSpeed: Double) : Goal() {
+        init {
+            controls = EnumSet.of(Control.MOVE, Control.LOOK)
+        }
+
+        private var updateTicks = 0
+
+        override fun canStart(): Boolean = target?.isAlive == true && (target as? PlayerEntity)?.let { !(it.isSpectator || it.isCreative) } ?: true && squaredDistanceTo(target) > maxDistance.squared()
+
+        override fun start() {
+            updateTicks = 0
+        }
+
+        override fun stop() {
+            effectiveNavigation.stop()
+        }
+
+        override fun shouldRunEveryTick(): Boolean = true
+
+        override fun tick() {
+            val target = target ?: return
+
+            lookControl.lookAt(target, 30f, 30f)
+
+            updateTicks--
+
+            if (updateTicks <= 0) {
+                updateTicks = getTickCount(10)
+                effectiveNavigation.startMovingTo(target, if (squaredDistanceTo(target) > farDistance.squared()) farSpeed else normalSpeed)
+            }
         }
     }
 }

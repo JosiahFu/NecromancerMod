@@ -18,11 +18,13 @@ object NecromancerModClient : ClientModInitializer {
 		NecromancerEntityModel.register()
 		EntityRendererRegistry.register(NecromancerModEntities.NECROMANCER, ::NecromancerEntityRenderer)
 
-		ParticleFactoryRegistry.getInstance().apply {
-			register(NecromancerModParticles.NECROMANCER_SUMMON_PARTICLE, NecromancerSummonParticle::Factory)
-			register(NecromancerModParticles.NECROMANCER_PARTICLE, NecromancerParticle::Factory)
-			register(NecromancerModParticles.NECROMANCER_SUMMON_PARTICLE_EMITTER, NecromancerEmitterParticle.SummonFactory())
-			register(NecromancerModParticles.NECROMANCER_TELEPORT_PARTICLE_EMITTER, NecromancerEmitterParticle.TeleportFactory())
+		with (ParticleFactoryRegistry.getInstance()) {
+			with (NecromancerModParticles) {
+				register(NECROMANCER_SUMMON_PARTICLE, NecromancerSummonParticle::Factory)
+				register(NECROMANCER_PARTICLE, NecromancerParticle::Factory)
+				register(NECROMANCER_SUMMON_PARTICLE_EMITTER, NecromancerEmitterParticle.SummonFactory())
+				register(NECROMANCER_TELEPORT_PARTICLE_EMITTER, NecromancerEmitterParticle.TeleportFactory())
+			}
 		}
 	}
 }

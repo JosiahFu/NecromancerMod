@@ -57,7 +57,7 @@ class NecromancerSummonGoal(private val owner: NecromancerEntity) : Goal() {
             NecromancerMod.logger.measure("locate ${structure.id}") {
                 serverWorld.locateStructure(structure, owner.blockPos, 0, false)
             }?.let {
-                it.horizontalSquaredDistance(owner.blockPos) <= distance * distance
+                it.horizontalSquaredDistance(owner.blockPos) <= distance.squared()
             } ?: false
 
         val nearVillage by lazy { structureWithin(StructureTags.VILLAGE, 64) }
